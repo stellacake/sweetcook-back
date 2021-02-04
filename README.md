@@ -9,4 +9,4 @@ $ npm install
 $ npm start
 ```
 
-## Don't forget to add .env and update it with
+### Don't forget to add .env and update it.
