@@ -1,6 +1,6 @@
 # sweetcook-back
 
-This is the backend part of my projet Sweetcook. Be sure to `npm start` this part to use the front end part.
+This is the back-end part of my projet Sweetcook. Be sure to `npm start` this part to use the front-end part.
 
 ## Getting started
 
