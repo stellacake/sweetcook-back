@@ -1,6 +1,90 @@
 const express = require("express");
 const router = express.Router();
 const connection = require("../config");
+const verifyToken = require("./controllers/usersController");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+// POST a user
+router.post("/", (req, res) => {
+	const hash = bcrypt.hashSync(req.body.password, 10);
+	const dataUser = {
+		name: req.body.name,
+		email: req.body.email,
+		password: hash,
+		admin: req.body.admin,
+	};
+
+	connection.query("INSERT INTO user SET ?", [dataUser], (err, results) => {
+		if (err) {
+			res.sendStatus(500);
+		} else {
+			return connection.query(
+				"SELECT id, name, email, admin FROM user WHERE id = ?",
+				results.insertId,
+				(err2, records) => {
+					if (err2) {
+						return res.status(500).json({
+							error: err2.message,
+							sql: err2.sql,
+						});
+					}
+					const insertedUser = records[0];
+					const { ...user } = insertedUser;
+					const host = req.get("host");
+					const location = `http://${host}${req.url}/${user.id}`;
+					return res.status(201).set("Location", location).json(user);
+				}
+			);
+		}
+	});
+});
+
+// Check if user account exists and password is ok
+router.post("/login", (req, res) => {
+	connection.query(
+		"SELECT *  FROM user WHERE name = ?",
+		[req.body.name],
+		(err, results) => {
+			if (err || results.length === 0) {
+				res.status(401).send("Identifiants incorrects");
+			} else {
+				const goodPassword = bcrypt.compareSync(
+					req.body.password,
+					results[0].password
+				);
+				const formData = {
+					id: results[0].id,
+					name: results[0].name,
+					email: results[0].email,
+					admin: results[0].admin,
+				};
+				if (goodPassword) {
+					jwt.sign({ formData }, process.env.SECRET_KEY, (error, token) => {
+						if (error) {
+							res.sendStatus(401);
+						} else {
+							res.json(token);
+						}
+					});
+				} else {
+					res.status(401).send("Identifiants incorrects");
+				}
+			}
+		}
+	);
+});
+
+// Verify user token
+router.post("/profile", verifyToken, (req, res) => {
+	jwt.verify(req.token, process.env.SECRET_KEY, (err, results) => {
+		if (err) {
+			res.sendStatus(401);
+		} else {
+			res.json({ results });
+		}
+	});
+});
 
 // GET list of all users
 router.get("/", (req, res) => {

@@ -55,6 +55,7 @@ router.get("/:id", (req, res) => {
 router.post("/", (req, res) => {
 	const {
 		title,
+		quantity,
 		picture,
 		duration,
 		level_id,
@@ -74,16 +75,17 @@ router.post("/", (req, res) => {
 		step_3,
 		step_4,
 		step_5,
-		stept_6,
+		step_6,
 		step_7,
 		step_8,
 		step_9,
 		step_10,
 	} = req.body;
 	connection.query(
-		"INSERT INTO recipe(title, picture, duration, level_id, taste_id, ingredient_1, ingredient_2, ingredient_3, ingredient_4, ingredient_5, ingredient_6, ingredient_7, ingredient_8, ingredient_9, ingredient_10, step_1, step_2, step_3, step_4, step_5, step_6, step_7, step_8, step_9, step_10) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+		"INSERT INTO recipe(title, quantity, picture, duration, level_id, taste_id, ingredient_1, ingredient_2, ingredient_3, ingredient_4, ingredient_5, ingredient_6, ingredient_7, ingredient_8, ingredient_9, ingredient_10, step_1, step_2, step_3, step_4, step_5, step_6, step_7, step_8, step_9, step_10) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 		[
 			title,
+			quantity,
 			picture,
 			duration,
 			level_id,
@@ -103,7 +105,7 @@ router.post("/", (req, res) => {
 			step_3,
 			step_4,
 			step_5,
-			stept_6,
+			step_6,
 			step_7,
 			step_8,
 			step_9,
@@ -123,8 +125,8 @@ router.post("/", (req, res) => {
 								sql: err2.sql,
 							});
 						}
-						const insertedrecipe = records[0];
-						const { ...recipe } = insertedrecipe;
+						const insertedRecipe = records[0];
+						const { ...recipe } = insertedRecipe;
 						const host = req.get("host");
 						const location = `http://${host}${req.url}/${recipe.id}`;
 						return res.status(201).set("Location", location).json(recipe);
@@ -146,23 +148,7 @@ router.put("/:id", (req, res) => {
 			if (err) {
 				res.sendStatus(err);
 			} else {
-				return connection.query(
-					"SELECT * FROM recipe WHERE id = ?",
-					results.insertId,
-					(err2, records) => {
-						if (err2) {
-							return res.status(500).json({
-								error: err2.message,
-								sql: err2.sql,
-							});
-						}
-						const insertedrecipe = records[0];
-						const { ...recipe } = insertedrecipe;
-						const host = req.get("host");
-						const location = `http://${host}${req.url}/${recipe.id}`;
-						return res.status(201).set("Location", location).json(recipe);
-					}
-				);
+				res.status(200).send("Data well updated");
 			}
 		}
 	);
