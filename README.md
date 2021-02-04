@@ -10,10 +10,3 @@ $ npm start
 ```
 
 ## Don't forget to add .env and update it with
-
-- PORT=
-- DB_HOST=
-- DB_USER=
-- DB_PASSWORD=
-- DB_NAME=
-- SECRET_KEY=
